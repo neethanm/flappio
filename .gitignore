@@ -1,0 +1,4 @@
+socket testing/
+node_modules/*
+*.sublime-*
+*.ase
