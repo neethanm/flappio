@@ -1,0 +1,68 @@
+*
+{
+  padding:0px;
+  margin:0px;
+}
+
+
+/*appearance of the pause button */
+.pause
+{
+  background:#e56400;
+  position:relative;
+  height:22px;
+  width:22px;
+  margin:10px;
+  border:2px solid #5c4600;
+  border-bottom:4px solid #542801;
+  box-shadow: 1px 1px 1px white inset;
+}
+
+/*Appearance of the button after the game  */
+.pause:after , .pause:before
+{
+  content:'';
+  position:absolute;
+  background:#fff;
+  width:5px;
+  height:15px;
+  z-index:1;
+  margin-left:5px;
+  margin-top:4px;
+  border-bottom:1px solid #ad4007;
+}
+ .pause:before {
+   margin-left:12px;
+ }
+
+ /* settings button */
+
+ .settings
+{
+ 
+  background:#e56400;
+  position:relative;
+  height:22px;
+  width:22px;
+  margin:10px;
+  border:2px solid #5c4600;
+  border-bottom:4px solid #542801;
+  box-shadow: 1px 1px 1px white inset;
+}
+/*play button */
+
+.play
+{
+ 
+  background:#e56400;
+  position:relative;
+  height:22px;
+  width:22px;
+  margin:10px;
+  border:2px solid #5c4600;
+  border-bottom:4px solid #542801;
+  box-shadow: 1px 1px 1px white inset;
+}
+
+
+ 
