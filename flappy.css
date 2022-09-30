@@ -1,7 +1,42 @@
-*
-{
-  padding:0px;
-  margin:0px;
+:root {
+  --scale-amount: .4;
+
+  --rod-gap: -50px;
+  --rod-img-height: 2048px;
+  --rod-offset: calc(var(--rod-img-height)*var(var(--scale-amount)));
+
+  --button-border: 
+}
+
+/* Keep it simple */
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+/* prevent scrolling */
+body {
+  overflow: hidden;
+}
+
+/* objects are placed relative to screen origin */
+.obj {
+  position: absolute;
+}
+
+/* properties of different types of objects */
+
+.rod {
+  transform: scale(var(--scale-amount)) translate(0px, calc(var(--rod-gap)/2 - 100%));
+}
+.rodinv {
+  transform:
+    scale(
+      var(--scale-amount),
+      calc(-1*var(--scale-amount)))  /* Inverted Rod */
+    /* translate(0px, calc(-1*var(--rod-gap)/2 - 100% - 2048px)) */
+    translate(0px, calc(var(--rod-gap) + 2*var(--rod-img-height)));
+    /* rotate(180deg);  Inverted rod */
 }
 
 
@@ -9,60 +44,54 @@
 .pause
 {
   background:#e56400;
-  position:relative;
+  /* position:relative; */
   height:22px;
   width:22px;
-  margin:10px;
   border:2px solid #5c4600;
   border-bottom:4px solid #542801;
   box-shadow: 1px 1px 1px white inset;
 }
 
 /*Appearance of the button after the game  */
-.pause:after , .pause:before
-{
+.pause:after, .pause:before {
   content:'';
-  position:absolute;
+  position: absolute;
   background:#fff;
-  width:5px;
+  width:4.5px;
   height:15px;
-  z-index:1;
   margin-left:5px;
   margin-top:4px;
   border-bottom:1px solid #ad4007;
 }
- .pause:before {
-   margin-left:12px;
- }
+.pause:before {
+  margin-left:12px;
+}
 
- /* settings button */
-
- .settings
+.settings
 {
- 
   background:#e56400;
-  position:relative;
   height:22px;
   width:22px;
-  margin:10px;
   border:2px solid #5c4600;
   border-bottom:4px solid #542801;
   box-shadow: 1px 1px 1px white inset;
 }
-/*play button */
 
 .play
 {
- 
   background:#e56400;
   position:relative;
   height:22px;
   width:22px;
-  margin:10px;
   border:2px solid #5c4600;
   border-bottom:4px solid #542801;
   box-shadow: 1px 1px 1px white inset;
 }
 
+
+/* Fix icon position */
+ion-icon {
+  transform: translate(0px, 1.7px);
+}
 
  
