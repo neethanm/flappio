@@ -1,8 +1,8 @@
 :root {
   --scale-amount: .4;
 
-  --rod-gap: -50px;
-  --rod-img-height: 2048px;
+  --rod-gap: 300px;
+  --rod-img-height: 1500px;
   --rod-offset: calc(var(--rod-img-height)*var(var(--scale-amount)));
 
   --button-border: 
