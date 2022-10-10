@@ -26,6 +26,10 @@ body {
 
 /* properties of different types of objects */
 
+.clouds1 .clouds2 .bgGrass1 .bgGrass2 .fgGrass1 .fgGrass2 {
+  transform: translate(0px);
+}
+
 .rod {
   transform: scale(var(--scale-amount)) translate(0px, calc(var(--rod-gap)/2 - 100%));
 }
@@ -39,6 +43,9 @@ body {
     /* rotate(180deg);  Inverted rod */
 }
 
+.bird {
+  transform: scale(10);
+}
 
 /*appearance of the pause button */
 .pause
