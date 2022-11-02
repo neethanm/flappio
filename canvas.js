@@ -1,9 +1,25 @@
 FPS = 60
-cloudSpeed = .2
-bgGrassSpeed = 1
-fgGrassSpeed = 1.5
 
 function init() {
+    let event_queue = []
+    let entities = simulate(event_queue);  // simulate() is asynchronous
+    
+    slide_bg()
+
+    let canvas = document.querySelector('#game-canvas')
+
+    setInterval(() => {
+        for (entity of entities)
+            entity.render(canvas)
+    }, 1000/FPS)
+
+}
+
+function slide_bg() {
+    const cloudSpeed = .2
+    const bgGrassSpeed = 1
+    const fgGrassSpeed = 1.5
+    
     let cloudPos = 0
     let bgGrassPos = 0
     let fgGrassPos = 0
@@ -18,6 +34,6 @@ function init() {
         cloudPos = (cloudPos-cloudSpeed)%screen.width
         bgGrassPos = (bgGrassPos-bgGrassSpeed)%screen.width
         fgGrassPos = (fgGrassPos-fgGrassSpeed)%screen.width
-        console.log(bgGrassPos)
+        // console.log(bgGrassPos)
     }, 1000/FPS)
 }

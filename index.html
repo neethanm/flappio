@@ -5,10 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flappy Bird</title>
-	<!-- <link rel="stylesheet" href="global.css"> -->
+    <!-- <link rel="stylesheet" href="global.css"> -->
     <link rel="stylesheet" href="flappy.css">
     <link href='https://fonts.googleapis.com/css?family=Fascinate|Erica+One' rel='stylesheet' type='text/css'>
 
+    <script src="Simulation.js"></script>
     <script src="canvas.js"></script>
 
     <style>
@@ -42,21 +43,23 @@
 </head>
 <body onload="init()">
     
-	<img class="obj clouds1" src="Sprites/BG_clouds.png" width="100%" height="100%"/>
-	<img class="obj clouds2" src="Sprites/BG_clouds.png" width="100%" height="100%"/>
+    <img class="obj clouds1" src="Sprites/BG_clouds.png" width="100%" height="100%"/>
+    <img class="obj clouds2" src="Sprites/BG_clouds.png" width="100%" height="100%"/>
     
-	<img class="obj bgGrass1" src="Sprites/BG_back.png" width="100%" height="100%"/>
-	<img class="obj bgGrass2" src="Sprites/BG_back.png" width="100%" height="100%"/>
+    <img class="obj bgGrass1" src="Sprites/BG_back.png" width="100%" height="100%"/>
+    <img class="obj bgGrass2" src="Sprites/BG_back.png" width="100%" height="100%"/>
 
-	<img class="obj fgGrass1" src="Sprites/BG_front.png" width="100%" height="100%"/>
-	<img class="obj fgGrass2" src="Sprites/BG_front.png" width="100%" height="100%"/>
+    <img class="obj fgGrass1" src="Sprites/BG_front.png" width="100%" height="100%"/>
+    <img class="obj fgGrass2" src="Sprites/BG_front.png" width="100%" height="100%"/>
     
 
-	<img class="obj rod_g0 rod" src="Sprites/rod.png"/>
-	<img class="obj rod_g0 rodinv" src="Sprites/rod.png"/>
-	<img class="obj rod_g1 rod" src="Sprites/rod.png"/>
-	<img class="obj rod_g1 rodinv" src="Sprites/rod.png"/>
-	<img class="obj bird0 bird" src="Sprites/bird sad.png"/>
+    <canvas id="game-canvas" width="100%" height="100%"></canvas>
+
+    <img class="obj rod_g0 rod" src="Sprites/rod.png"/>
+    <img class="obj rod_g0 rodinv" src="Sprites/rod.png"/>
+    <img class="obj rod_g1 rod" src="Sprites/rod.png"/>
+    <img class="obj rod_g1 rodinv" src="Sprites/rod.png"/>
+    <img class="obj bird0 bird" src="Sprites/bird sad.png"/>
 
     <div id="pause1" class="obj pause"></div>
 
