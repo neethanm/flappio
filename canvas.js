@@ -1,5 +1,3 @@
-FPS = 60
-
 function init() {
     let event_queue = []
     let entities = simulate(event_queue);  // simulate() is asynchronous

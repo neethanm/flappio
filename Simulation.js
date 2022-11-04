@@ -1,10 +1,10 @@
 const FPS = 60  // combine into one file
 
 class GameEvent {
-    constructor(type, time, prop) {
+    constructor(type, time, props) {
         this.type = type
         this.time = time
-        this.prop = prop
+        this.props = props
     }
 }
 
@@ -33,10 +33,11 @@ class GameObject {
 }
 
 class RodObject extends GameObject {
-    this_vel = 1;
+    rod_vel = -.001;
     
     constructor(pos) {
-        super(pos, this_vel)
+        super(pos, [0, 0])
+        this.vel[0] = this.rod_vel
     }
 
     render(canvas) {
@@ -65,31 +66,50 @@ function render_entities(entities, canvas) {
     for (entity of entities) entity.render(canvas)
 }
 
+function handleGameEvent(event, entities) {
+    switch (event.type) {
+    case 'Rod':
+        entities.push(new RodObject([1.1, event.props.height]));
+        break;
+    }
+}
+
 function simulate(queue) {
 
-    event_gatherer(queue);
+    let start_time = event_generator(queue);
 
     let entities = []
-    
+
     setInterval(function simulation_tick() {
 
+        let now = new Date().getTime() - start_time;
+        
         // TODO: change entities from events
-
+        for (let event of queue) {
+            let delta = event.time - now;
+            if (delta < 10 && delta > -10) {
+                handleGameEvent(event, entities);
+                console.log(entities)
+            }
+        }
+        
+        
         // tick all entities
         let ended = []
-        for (rod_idx in entities) {
+        for (let rod_idx in entities) {
             let exists = entities[rod_idx].tick()
-            console.log(entitues[rod_idx]);
+            // console.log(entities[rod_idx]);
             if (!exists) ended.push(rod_idx)
         }
+        if (ended.length) console.log(ended, entities)
 
         // remove entities that won't be simulated anymore
         ended.reverse()
-        for (rod_idx of ended) {
+        for (let rod_idx of ended) {
             entities.splice(rod_idx, 1)
         }
-        // console.log("The simulation is running indeed")
 
+        // console.log(entities, queue);
 
     }, 1000/FPS);
 
@@ -97,17 +117,19 @@ function simulate(queue) {
 
 }
 
-function event_gatherer(queue) {  // imitates server and user sending events
+function event_generator(queue) {  // imitates server and user sending events
     let rodN = 0;
     const ROD_INTERVAL = 6000;
     
+    let start_time = new Date();
     setInterval(() => {
-        queue.push(new GameEvent('Rod', rodN*ROD_INTERVAL, {
+        let now = new Date() - start_time;
+        queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
             height: Math.random()
         }));
         rodN++;
     }, ROD_INTERVAL);
 
-}
+    return start_time;
 
-exports.simulate = simulate;
+}
