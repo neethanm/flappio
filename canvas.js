@@ -1,5 +1,3 @@
-FPS = 60
-
 function init() {
     let event_queue = []
     let entities = simulate(event_queue);  // simulate() is asynchronous
@@ -10,7 +8,7 @@ function init() {
 
     setInterval(() => {
         for (entity of entities)
-            entity.render(canvas)
+            entity.render(canvas.getContext("2d"))
     }, 1000/FPS)
 
 }

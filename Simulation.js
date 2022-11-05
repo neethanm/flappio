@@ -34,26 +34,14 @@ class GameObject {
 
 class RodObject extends GameObject {
     rod_vel = -.001;
-    offScreenCanvas= document.createElement('canvas');
-    offScreenCanvas.width= '1360px';
-    offScreenCanvas.height= '400px';
-    var context= offScreenCanvas.getContext("2d");
-    var myImgElement = document.getElementById("myImg");
-    var myCanvasElement = document.createElement("canvas");
-    myCanvasElement.width = myImgElement.width;
-    myCanvasElement.height = myImgElement.height;
-    var context = myCanvasElement.getContext('2d');
-    context.drawImage(myImgElement,0,0);
+    
     constructor(pos) {
         super(pos, [0, 0])
         this.vel[0] = this.rod_vel
     }
 
-    render(canvas_context) {
+    render(canvas) {
         // TODO: RENDER THE ROD HERE
-        let offscreen_Rod = this.offscreen_Rod;
-        let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height]; 
-        canvas_context.putImageData(offscreen_Rod,pos[0],pos[1]);
     }
     
 }
