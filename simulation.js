@@ -31,19 +31,33 @@ class GameObject {
     }
 
 }
+async function getImage(path){
+    offscreenRod= document.createElement('canvas');
+    offscreenRod.width= '1360px';
+    offscreenRod.height= '400px';
+    context= offscreenRod.getContext("2d");
+    myImgElement = document.getElementById("myImg");
+    myCanvasElement = document.createElement("canvas");
+    myCanvasElement.width = myImgElement.width;
+    myCanvasElement.height = myImgElement.height;
+    context.drawImage(myImgElement,0,0);
+
+    var ctx = canvas.getContext('2d');
+    //Loading of the home test image - img1
+    var img1 = new Image();
+    img1.src = path;
+    //drawing of the test image - img1
+    img1.onload = function () {
+    //draw background image
+        ctx.drawimage(img1, 0, 0);
+    }
+    return offscreenRod;
+}
 
 class RodObject extends GameObject {
     rod_vel = -.001;
-    offScreenCanvas= document.createElement('canvas');
-    offScreenCanvas.width= '1360px';
-    offScreenCanvas.height= '400px';
-    var context= offScreenCanvas.getContext("2d");
-    var myImgElement = document.getElementById("myImg");
-    var myCanvasElement = document.createElement("canvas");
-    myCanvasElement.width = myImgElement.width;
-    myCanvasElement.height = myImgElement.height;
-    var context = myCanvasElement.getContext('2d');
-    context.drawImage(myImgElement,0,0);
+    offscreenRod = getImage("sprites/rod.png")
+    
     constructor(pos) {
         super(pos, [0, 0])
         this.vel[0] = this.rod_vel
@@ -51,9 +65,9 @@ class RodObject extends GameObject {
 
     render(canvas_context) {
         // TODO: RENDER THE ROD HERE
-        let offscreen_Rod = this.offscreen_Rod;
+        let offscreenRod = this.offscreenRod;
         let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height]; 
-        canvas_context.putImageData(offscreen_Rod,pos[0],pos[1]);
+        canvas_context.putImageData(offscreenRod,pos[0],pos[1]);
     }
     
 }
