@@ -2,3 +2,7 @@ socket testing/
 node_modules/*
 *.sublime-*
 *.ase
+*.zip
+*.tsk
+package.json
+package-lock.json

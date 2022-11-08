@@ -5,10 +5,20 @@ function init() {
     slide_bg()
 
     let canvas = document.querySelector('#game-canvas')
+    ctx = canvas.getContext("2d");
 
+    ctx.fillStyle = "#FF0000";
+    ctx.fillRect(0, 0, 150, 75);
+
+    // setInterval(() => {
+    //     for (entity of entities)
+    //         entity.render(canvas.getContext("2d"))
+    // }, 1000/FPS)
+
+    rod = new RodObject([.5, .5])
+    
     setInterval(() => {
-        for (entity of entities)
-            entity.render(canvas.getContext("2d"))
+        rod.render(ctx)
     }, 1000/FPS)
 
 }

@@ -32,18 +32,47 @@ class GameObject {
 
 }
 
+async function getImage(path){
+    // conver image loading from async to synchronous using a Promise
+    img1 = await new Promise(ret => {
+        let img = new Image();
+        img.src = path;
+        img.onload = () => ret(img);  // return when img is loaded
+    })
+
+    let canvas = document.createElement('canvas');
+    // canvas.width= '1360px';
+    // canvas.height= '400px';
+    context = canvas.getContext("2d");
+
+    context.drawImage(img1, 0, 0);
+    // URL.revokeObjectURL(url)
+    return canvas;
+}
+
 class RodObject extends GameObject {
     rod_vel = -.001;
-    
+
     constructor(pos) {
         super(pos, [0, 0])
         this.vel[0] = this.rod_vel
+        getImage("sprites/rod.png").then((canvas) => {
+            this.offscreenRod = canvas;
+        });  // canvas
     }
 
-    render(canvas) {
+    render(canvas_context) {
         // TODO: RENDER THE ROD HERE
+        let offscreenRod = this.offscreenRod;
+        let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height];
+        // TODO: Center the rod
+        console.log(offscreenRod)
+        // if (offscreenRod !== undefined) {
+            let offscreen_data = offscreenRod.getImageData(0, 0, 200, 200);
+            canvas_context.putImageData(offscreen_data,pos[0],pos[1]);
+            canvas_context.putImageData(offscreenRod,pos[0],pos[1]);
+        // }
     }
-    
 }
 
 class BirdObject extends GameObject {
