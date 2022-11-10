@@ -5,7 +5,9 @@ function init() {
     slide_bg()
 
     let canvas = document.querySelector('#game-canvas')
-    ctx = canvas.getContext("2d");
+    canvas.height = screen.height
+    canvas.width  = screen.width
+    let ctx = canvas.getContext("2d");
 
     ctx.fillStyle = "#FF0000";
     ctx.fillRect(0, 0, 150, 75);
@@ -15,12 +17,16 @@ function init() {
     //         entity.render(canvas.getContext("2d"))
     // }, 1000/FPS)
 
-    rod = new RodObject([.5, .5])
-    
-    setInterval(() => {
-        rod.render(ctx)
-    }, 1000/FPS)
+    getImage("sprites/rod.png").then(() => {
+        // let offscreenRod = canvas;
+        let rodImg = canvas;
+        ctx.drawImage(rodImg, 500, 500)
+    });  // canvas
 
+    setInterval(() => {
+        ctx.clearRect(0, 0, screen.width, screen.height)
+        render_entities(entities, ctx)
+    }, 1000/FPS);
 }
 
 function slide_bg() {
