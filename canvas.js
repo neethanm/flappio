@@ -1,6 +1,16 @@
 function init() {
     let event_queue = []
     let entities = simulate(event_queue);  // simulate() is asynchronous
+
+    entities.push(new RodObject([.6, .56]));
+    entities.push(new BlankObject([.4, .4], [.000, .000], 602, 144))
+    entities.push(new RodObject([.3, .2]));
+    // entities.push(new BirdObject([.1, .3], [0, 1.2], 512, 512))
+    // entities.push(new BirdObject([.2, .3], [0, 1.3], 512, 512))
+    // entities.push(new BirdObject([.3, .3], [0, 1.4], 512, 512))
+    // entities.push(new BirdObject([.4, .3], [0, 1.5], 512, 512))
+    // entities.push(new BirdObject([.5, .3], [0, 1.6], 512, 512))
+    // entities.push(new BirdObject([.6, .3], [0, 1.7], 512, 512))
     
     slide_bg()
 

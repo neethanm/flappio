@@ -1,4 +1,5 @@
 const FPS = 60  // combine into one file
+const GRAVITY = .0981/FPS
 
 class GameEvent {
     constructor(type, time, props) {
@@ -6,31 +7,6 @@ class GameEvent {
         this.time = time
         this.props = props
     }
-}
-
-class GameObject {
-    constructor(id, pos, vel, w, h, img) {
-        this.pos = pos
-        this.vel = vel
-        this.w = w
-        this.h = h
-        this.img = img
-        this.id = id
-    }
-
-    tick() {
-        this.pos[0] += this.vel[0]
-        this.pos[1] += this.vel[1]
-
-        // console.log("OBJ", screen.width*this.pos[0], screen.height*this.pos[1])
-        
-        if (this.pos[0] < -.6 || 1.6 < this.pos[0]) return false;
-        if (this.pos[1] < -.6 || 1.6 < this.pos[1]) return false;
-        return true;
-    }
-
-    render(canvas_context) {}
-
 }
 
 async function getImage(path){
@@ -42,36 +18,85 @@ async function getImage(path){
     })
 
     let canvas = document.createElement('canvas');
-    // canvas.width= '1360px';
-    // canvas.height= '400px';
-    context = canvas.getContext("2d");
+    canvas.width= '140px';
+    canvas.height= '140px';
+    context = canvas.getContext("2d", {willReadFrequently: true});
 
-    return img1;
-    // context.drawImage(img1, 0, 0);
-    // URL.revokeObjectURL(url)
-    // return canvas;
+    console.error(canvas.getBoundingClientRect());
+    
+    // return img1;
+    context.drawImage(img1, 0, 0);
+    context.fillStyle = '#00ff0080'
+    context.fillRect(0, 0, 1e4, 1e4)
+    console.error(context.width)
+    return canvas;
 }
 
-class RodObject extends GameObject {
-    rod_vel = -.00352;
+class GameObject {
+    constructor(pos, vel, w, h) {
+        this.pos = pos
+        this.vel = vel
+        this.w = w
+        this.h = h
+        this.id = new Date()
+        this.set_canvas = this.set_canvas.bind(this)
+    }
 
-    x = getImage("sprites/rod.png").then((canvas) => {
-        this.p = canvas;
-    });  // canvas
+    set_canvas(canvas) {
+        // console.log("Trying to set canvas for", this)
+        this.canvas = canvas
+        this.ctx = canvas.getContext('2d')
+        // this.ctx = canvas.getContext('2d', {willReadFrequently: true})
+    }
     
-    constructor(id, pos) {
-        super(id, pos, [0, 0])
-        this.vel[0] = this.rod_vel
+    tick() {
+        this.pos[0] += this.vel[0]
+        this.pos[1] += this.vel[1]
+
+        // console.log("OBJ", screen.width*this.pos[0], screen.height*this.pos[1])
+        
+        if (this.pos[0] < -.6 || 1.6 < this.pos[0]) return false;
+        if (this.pos[1] < -.6 || 1.6 < this.pos[1]) return false;
+        return true;
     }
 
     render(canvas_context) {
-        console.log(this.p)
-        let offscreenRod = this.p.getContext('2d');
+        // console.log(this.ctx)
+        let offscreenRod = this.ctx
         let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height];
         // TODO: Center the rod
         let offscreen_data = offscreenRod.getImageData(0, 0, 200, 200);
         // console.log(offscreenRod)
-        canvas_context.drawImage(offscreen_data, pos[0], pos[1]);
+        canvas_context.putImageData(offscreen_data, pos[0], pos[1]);
+        // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
+        console.log()
+        // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
+    }
+
+}
+
+class RodObject extends GameObject {
+    // rod_vel = -.013;
+    rod_vel = -.000;
+
+    img_promise = getImage("sprites/rod.png")
+    
+    constructor(pos) {
+        super(pos, [0, 0], 10, 10)
+        this.vel[0] = this.rod_vel
+        this.img_promise.then(this.set_canvas)
+    }
+
+    render(canvas_context) {
+        // console.log(this.ctx)
+        let offscreenRod = this.ctx
+        let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height];
+        // TODO: Center the rod
+        
+        
+        let offscreen_data = offscreenRod.getImageData(0, 0, 200, 200);
+        // console.log(offscreenRod)
+        canvas_context.putImageData(offscreen_data, pos[0], pos[1]);
         // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
         console.log()
         // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
@@ -79,18 +104,46 @@ class RodObject extends GameObject {
 }
 
 class BirdObject extends GameObject {
+    auto_thresh = .7
+    tap_speed = -.037
+
+    img_promise = getImage("sprites/bird not angry big.png")
 
     constructor(pos, vel, /* TODO: OTHER ARGUMENTS */) {
         super(pos, vel)
         // TODO: CONSTRUCTOR CODE
+        this.img_promise.then(this.set_canvas)
     }
 
     tick() {
-        // TODO: UPDATE BIRD HERE
-    }
+        this.pos[0] += this.vel[0]
+        this.pos[1] += this.vel[1]
 
+        this.vel[1] += GRAVITY
+
+        // console.log("OBJ", screen.width*this.pos[0], screen.height*this.pos[1])
+        
+        if (this.pos[1] > this.auto_thresh) this.vel[1] = this.tap_speed;
+        return true;
+    }
+}
+
+class BlankObject extends GameObject {
+    img_promise = getImage('Sprites/blank.png')
+    
+    constructor(pos, vel, w, h) {
+        super(pos, vel, w, h)
+        this.img_promise.then(this.set_canvas)
+    }
+    
     render(canvas_context) {
-        // TODO: RENDER THE BIRD HERE
+        let ctx = this.canvas.getContext("2d")
+        let pos = [this.pos[0]*screen.width, this.pos[1]*screen.height]
+
+        let data = ctx.getImageData(0, 0, this.w, this.h)
+    
+        canvas_context.putImageData(data, pos[0], pos[1])
+        // console.log(this, ":- Image has been drawn")
     }
 }
 
@@ -103,31 +156,39 @@ function handleGameEvent(event, entities) {
     case 'Rod':
         console.log("Inserted new rod from event")
         entities.push(new RodObject(
-            new Date(), [1.1, event.props.height]));
+            [.5, event.props.height]));
         break;
     }
 }
 
 function simulate(queue) {
+    const MAX_EVENT_DELAY = 12000
 
     let start_time = event_generator(queue);
 
     let entities = []
 
     setInterval(function simulation_tick() {
-
-        
         let now = new Date().getTime() - start_time;
         // console.log("SIMULATION TICK", now)
         
         // TODO: change entities from events
+        let ended_events = [];
         if (queue.length) console.log('NEW HANDLING')
-        for (let event of queue) {
+        for (let event_idx in queue) {
+            let event = queue[event_idx];
             let delta = event.time - now;
             if (-23 < delta && delta < 23) {
                 handleGameEvent(event, entities);
                 console.log("HANDLING EVENT", entities)
+            } else if (delta > MAX_EVENT_DELAY) {
+                ended_events.push(event_idx);
             }
+        }
+
+        ended_events.reverse()
+        for (let event_idx of ended_events) {
+            queue.splice(rod_idx, 1)
         }
 
         // tick all entities
@@ -150,23 +211,23 @@ function simulate(queue) {
 
     }, 1000/FPS);
 
-    setInterval(() => {
-        console.log("ENTITIES", entities)
-    }, 1000);
+    // setInterval(() => {
+    //     console.log("ENTITIES", entities)
+    // }, 1000);
     
     return entities
 }
 
 function event_generator(queue) {  // imitates server and user sending events
-    const ROD_INTERVAL = 1500;
+    const ROD_INTERVAL = 250;
     
     let start_time = new Date();
     setInterval(() => {
         console.log("NEW ROD EVENT")
         let now = new Date() - start_time;
-        queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
-            height: Math.random()
-        }));
+        // queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
+        //     height: Math.random()
+        // }));
         console.log("QUEUE", queue)
     }, ROD_INTERVAL);
     
