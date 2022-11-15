@@ -9,43 +9,46 @@ class GameEvent {
     }
 }
 
-async function getImage(path){
+async function getImage(path, w, h, scale){
     // conver image loading from async to synchronous using a Promise
-    img1 = await new Promise(ret => {
+    return await new Promise(ret => {
         let img = new Image();
         img.src = path;
         img.onload = () => ret(img);  // return when img is loaded
     })
 
-    let canvas = document.createElement('canvas');
-    canvas.width= '140px';
-    canvas.height= '140px';
-    context = canvas.getContext("2d", {willReadFrequently: true});
+    // let canvas = document.createElement('canvas');
+    // canvas.width= w*scale;
+    // canvas.height= h*scale;
+    // context = canvas.getContext("2d", {willReadFrequently: true});
 
-    console.error(canvas.getBoundingClientRect());
+    // // console.error(canvas.getBoundingClientRect());
     
-    // return img1;
-    context.drawImage(img1, 0, 0);
-    context.fillStyle = '#00ff0080'
-    context.fillRect(0, 0, 1e4, 1e4)
-    console.error(context.width)
-    return canvas;
+    // // return img1;
+    // context.scale(scale, scale)
+    // context.drawImage(img1, 0, 0);
+    // context.setTransform(1, 0, 0, 1, 0, 0)
+    // // context.fillStyle = '#00ff0080'
+    // // context.fillRect(0, 0, 1e4, 1e4)
+    // // console.error(context.width)
+    // return [canvas, w*scale, h*scale];
 }
 
 class GameObject {
-    constructor(pos, vel, w, h) {
+    constructor(pos, vel) {
         this.pos = pos
         this.vel = vel
-        this.w = w
-        this.h = h
         this.id = new Date()
         this.set_canvas = this.set_canvas.bind(this)
     }
 
     set_canvas(canvas) {
         // console.log("Trying to set canvas for", this)
+        // let [canvas, w, h] = props
         this.canvas = canvas
-        this.ctx = canvas.getContext('2d')
+        // this.ctx = canvas.getContext('2d')
+        // this.w = w
+        // this.h = h
         // this.ctx = canvas.getContext('2d', {willReadFrequently: true})
     }
     
@@ -131,8 +134,8 @@ class BirdObject extends GameObject {
 class BlankObject extends GameObject {
     img_promise = getImage('Sprites/blank.png')
     
-    constructor(pos, vel, w, h) {
-        super(pos, vel, w, h)
+    constructor(pos) {
+        super(pos, [0, 0])
         this.img_promise.then(this.set_canvas)
     }
     
@@ -223,12 +226,12 @@ function event_generator(queue) {  // imitates server and user sending events
     
     let start_time = new Date();
     setInterval(() => {
-        console.log("NEW ROD EVENT")
+        // console.log("NEW ROD EVENT")
         let now = new Date() - start_time;
         // queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
         //     height: Math.random()
         // }));
-        console.log("QUEUE", queue)
+        // console.log("QUEUE", queue)
     }, ROD_INTERVAL);
     
     return start_time;
