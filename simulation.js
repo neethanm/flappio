@@ -42,10 +42,10 @@ class GameObject {
         this.set_canvas = this.set_canvas.bind(this)
     }
 
-    set_canvas(canvas) {
+    set_canvas(img) {
         // console.log("Trying to set canvas for", this)
         // let [canvas, w, h] = props
-        this.canvas = canvas
+        this.img = img
         // this.ctx = canvas.getContext('2d')
         // this.w = w
         // this.h = h
@@ -64,23 +64,19 @@ class GameObject {
     }
 
     render(canvas_context) {
-        // console.log(this.ctx)
-        let offscreenRod = this.ctx
+        let offscreenRod = this.img
         let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height];
         // TODO: Center the rod
-        let offscreen_data = offscreenRod.getImageData(0, 0, 200, 200);
-        // console.log(offscreenRod)
-        canvas_context.putImageData(offscreen_data, pos[0], pos[1]);
-        // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
-        console.log()
-        // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
+        canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
     }
 
 }
 
 class RodObject extends GameObject {
-    // rod_vel = -.013;
-    rod_vel = -.000;
+    rod_vel = -.013;
+    rod_gap = 550
+    rod_scale = .4
+    // rod_vel = -.000;
 
     img_promise = getImage("sprites/rod.png")
     
@@ -92,29 +88,26 @@ class RodObject extends GameObject {
 
     render(canvas_context) {
         // console.log(this.ctx)
-        let offscreenRod = this.ctx
+        if (this.img === undefined) return;
+        let offscreenRod = this.img
         let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height];
         // TODO: Center the rod
-        
-        
-        let offscreen_data = offscreenRod.getImageData(0, 0, 200, 200);
-        // console.log(offscreenRod)
-        canvas_context.putImageData(offscreen_data, pos[0], pos[1]);
-        // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
-        console.log()
-        // canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
+        canvas_context.scale(.5, .5)
+        canvas_context.drawImage(offscreenRod, pos[0]/this.rod_scale, +pos[1]+this.rod_gap/2);
+        canvas_context.scale(1, -1)
+        canvas_context.drawImage(offscreenRod, pos[0]/this.rod_scale, -pos[1]+this.rod_gap/2);
+        canvas_context.setTransform(1, 0, 0, 1, 0, 0)
     }
 }
 
 class BirdObject extends GameObject {
-    auto_thresh = .7
+    auto_thresh = .5
     tap_speed = -.037
 
     img_promise = getImage("sprites/bird not angry big.png")
 
-    constructor(pos, vel, /* TODO: OTHER ARGUMENTS */) {
+    constructor(pos, vel) {
         super(pos, vel)
-        // TODO: CONSTRUCTOR CODE
         this.img_promise.then(this.set_canvas)
     }
 
@@ -159,8 +152,9 @@ function handleGameEvent(event, entities) {
     case 'Rod':
         console.log("Inserted new rod from event")
         entities.push(new RodObject(
-            [.5, event.props.height]));
+            [1.5, event.props.height]));
         break;
+    case 'Bird':
     }
 }
 
@@ -191,7 +185,7 @@ function simulate(queue) {
 
         ended_events.reverse()
         for (let event_idx of ended_events) {
-            queue.splice(rod_idx, 1)
+            queue.splice(event_idx, 1)
         }
 
         // tick all entities
@@ -210,7 +204,7 @@ function simulate(queue) {
             entities.splice(rod_idx, 1)
         }
 
-        // console.log(entities, queue);
+        console.log(entities, queue);
 
     }, 1000/FPS);
 
@@ -222,15 +216,15 @@ function simulate(queue) {
 }
 
 function event_generator(queue) {  // imitates server and user sending events
-    const ROD_INTERVAL = 250;
+    const ROD_INTERVAL = 120_000/72
     
     let start_time = new Date();
     setInterval(() => {
         // console.log("NEW ROD EVENT")
         let now = new Date() - start_time;
-        // queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
-        //     height: Math.random()
-        // }));
+        queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
+            height: Math.random()
+        }));
         // console.log("QUEUE", queue)
     }, ROD_INTERVAL);
     
