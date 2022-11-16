@@ -1,4 +1,9 @@
 function init() {
+    console.log("foo")
+    if (!window.screen.width){
+        return;
+    }
+    console.log("INIT IS RUNNING")
     let event_queue = []
     let entities = simulate(event_queue);  // simulate() is asynchronous
 
@@ -11,7 +16,7 @@ function init() {
     // entities.push(new BirdObject([.4, .3], [0, 1.5], 512, 512))
     // entities.push(new BirdObject([.5, .3], [0, 1.6], 512, 512))
     // entities.push(new BirdObject([.6, .3], [0, 1.7], 512, 512))
-    
+   console.log("foo") 
     slide_bg()
 
     let canvas = document.querySelector('#game-canvas')
@@ -19,7 +24,8 @@ function init() {
     canvas.width  = screen.width
     let ctx = canvas.getContext("2d", {willReadFrequently: true});
 
-    let Buff = new OffscreenCanvas(screen.width, screen.width);
+    console.log(screen.width, screen.height)
+    let Buff = new OffscreenCanvas(screen.width, screen.height);
     let b_ctx = Buff.getContext('2d', {willReadFrequently: true})
 
     // ctx.scale(.5, .5)
@@ -39,8 +45,6 @@ function init() {
     //     ctx.setTransform(1, 0, 0, 1, 0, 0)
     // });  // canvas
 
-    console.log()
-
     setInterval(() => {
         render_entities(entities, b_ctx)
         let data = b_ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -49,6 +53,8 @@ function init() {
             b_ctx.clearRect(0, 0, screen.width, screen.height)
         });
     }, 1000/FPS);
+
+    console.log("INIT ENDED")
 }
 
 function slide_bg() {

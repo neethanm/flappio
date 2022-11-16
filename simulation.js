@@ -90,12 +90,17 @@ class RodObject extends GameObject {
         // console.log(this.ctx)
         if (this.img === undefined) return;
         let offscreenRod = this.img
-        let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height];
+        let pos = [this.pos[0]*screen.width/this.rod_scale,this.pos[1]*screen.height];
         // TODO: Center the rod
         canvas_context.scale(.5, .5)
-        canvas_context.drawImage(offscreenRod, pos[0]/this.rod_scale, +pos[1]+this.rod_gap/2);
+        canvas_context.drawImage(offscreenRod, pos[0], +pos[1]+this.rod_gap/2);
+        // console.log(pos[0], pos[0]+this.w/2, this.w)
+        // canvas_context.fillStyle = "#ffffff"
+        // canvas_context.fillRect(...pos, 12, 12)
+        // canvas_context.fillStyle = "#1b1b1b"
+        // canvas_context.fillRect(...pos, 10, 10)
         canvas_context.scale(1, -1)
-        canvas_context.drawImage(offscreenRod, pos[0]/this.rod_scale, -pos[1]+this.rod_gap/2);
+        canvas_context.drawImage(offscreenRod, pos[0], -pos[1]+this.rod_gap/2);
         canvas_context.setTransform(1, 0, 0, 1, 0, 0)
     }
 }
@@ -116,7 +121,7 @@ class BirdObject extends GameObject {
         this.pos[1] += this.vel[1]
 
         this.vel[1] += GRAVITY
-        console.log(this.pos[1], this.vel[1])
+        // console.log(this.pos[1], this.vel[1])
 
         // console.log("OBJ", screen.width*this.pos[0], screen.height*this.pos[1])
         
@@ -184,7 +189,7 @@ function simulate(queue) {
         for (let event_idx in queue) {
             let event = queue[event_idx];
             let delta = event.time - now;
-            if (-23 < delta && delta < 23) {
+            if (-3 < delta && delta < 5) {
                 handleGameEvent(event, entities, birds);
                 console.log("HANDLING EVENT", entities)
             } else if (delta > MAX_EVENT_DELAY) {
@@ -244,7 +249,7 @@ function event_generator(queue) {  // imitates server and user sending events
         // console.log("NEW ROD EVENT")
         let now = new Date() - start_time;
         queue.push(new GameEvent('Bird', now+BIRD_INTERVAL, {
-            vel: [0, Math.random()]
+            vel: [.1, Math.random()*.8+.4]
         }));
         // console.log("QUEUE", queue)
     }, BIRD_INTERVAL);

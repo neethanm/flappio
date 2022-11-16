@@ -27,7 +27,7 @@ body {
 /*appearance of the pause button */
 .pause
 {
-  background:#e56400;
+  background:#e56400; 
   /* position:relative; */
   height:22px;
   width:22px;
@@ -54,6 +54,7 @@ body {
 .settings
 {
   background:#e56400;
+  top: 42px;
   height:22px;
   width:22px;
   border:2px solid #5c4600;
@@ -65,6 +66,7 @@ body {
 {
   background:#e56400;
   position:relative;
+  top: 72px;
   height:22px;
   width:22px;
   border:2px solid #5c4600;
