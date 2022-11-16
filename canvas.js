@@ -5,7 +5,7 @@ function init() {
     // entities.push(new RodObject([.6, .56]));
     // entities.push(new BlankObject([.4, .4], 602, 144))
     // entities.push(new RodObject([.3, .2]));
-    entities.push(new BirdObject([.1, .3], [0, 1.2], 512, 512))
+    // entities.push(new BirdObject([.1, .3], [0, 1.2], 512, 512))
     // entities.push(new BirdObject([.2, .3], [0, 1.3], 512, 512))
     // entities.push(new BirdObject([.3, .3], [0, 1.4], 512, 512))
     // entities.push(new BirdObject([.4, .3], [0, 1.5], 512, 512))
@@ -17,10 +17,10 @@ function init() {
     let canvas = document.querySelector('#game-canvas')
     canvas.height = screen.height
     canvas.width  = screen.width
-    let ctx = canvas.getContext("2d");
+    let ctx = canvas.getContext("2d", {willReadFrequently: true});
 
     let Buff = new OffscreenCanvas(screen.width, screen.width);
-    let b_ctx = Buff.getContext('2d')
+    let b_ctx = Buff.getContext('2d', {willReadFrequently: true})
 
     // ctx.scale(.5, .5)
     // ctx.fillStyle = "#FF0000";
