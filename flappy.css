@@ -1,11 +1,5 @@
 :root {
   --scale-amount: .4;
-
-  --rod-gap: 400px;
-  --rod-img-height: 1500px;
-  --rod-offset: calc(var(--rod-img-height)*var(var(--scale-amount)));
-
-  --button-border: 
 }
 
 /* Keep it simple */
@@ -28,23 +22,6 @@ body {
 
 .clouds1 .clouds2 .bgGrass1 .bgGrass2 .fgGrass1 .fgGrass2 {
   transform: translate(0px);
-}
-
-.rod {
-  transform: scale(var(--scale-amount)) translate(0px, calc(var(--rod-gap)/2 - 100%));
-}
-.rodinv {
-  transform:
-    scale(
-      var(--scale-amount),
-      calc(-1*var(--scale-amount)))  /* Inverted Rod */
-    /* translate(0px, calc(-1*var(--rod-gap)/2 - 100% - 2048px)) */
-    translate(0px, calc(var(--rod-gap) + 2*var(--rod-img-height)));
-    /* rotate(180deg);  Inverted rod */
-}
-
-.bird {
-  transform: scale(10);
 }
 
 /*appearance of the pause button */

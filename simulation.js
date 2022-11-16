@@ -157,8 +157,8 @@ function handleGameEvent(event, entities, birds) {
         break;
     case 'Bird':
         console.log("Bird Tap!")
-        let bird = birds[0];
-        bird.vel[1] = -.02
+        for (let bird of birds)
+            bird.vel[1] = -.02
     }
 }
 
@@ -171,7 +171,8 @@ function simulate(queue) {
     let birds = []
 
     birds.push(new BirdObject([.2, .5], [0, -.4]))
-    entities.push(birds[0])
+    for (let bird of birds)
+        entities.push(bird)
 
     setInterval(function simulation_tick() {
         let now = new Date().getTime() - start_time;
