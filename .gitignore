@@ -1,8 +1,9 @@
 socket testing/
-node_modules/*
+node_modules/
 *.sublime-*
 *.ase
 *.zip
 *.tsk
 package.json
 package-lock.json
+.vscode/
