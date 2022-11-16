@@ -26,7 +26,7 @@ function App() {
         <div id="pause1" className="obj pause"></div>
 
         <div> 
-        <button onClick={ocf} id="cog1" type="button" className="obj settings" onClick={screenLead}>
+        <button id="cog1" type="button" className="obj settings" onClick={screenLead}>
             <span className="button icon"><ion-icon name="cog-outline"></ion-icon></span>
         </button>
         </div>
@@ -39,4 +39,4 @@ function App() {
 
     </div>)
 }
-ReactDOM.render(<App />, document.querySelector('.app'))
+ReactDOM.render(<App />, document.querySelector('#app'))
