@@ -239,7 +239,7 @@ function simulate(queue, start_time) {
 }
 
 function event_generator(queue, start_time) {  // imitates server and user sending events
-    const ROD_INTERVAL = 2000
+    const ROD_INTERVAL = 1500
     
     setInterval(() => {
         // console.log("NEW ROD EVENT")

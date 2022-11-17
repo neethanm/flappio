@@ -6,7 +6,7 @@ class App extends React.Component{
     constructor(props) {
         super(props)
         this.state = {
-            values: []
+            values: [{"IP":"127.0.0.1","score":230},{"IP":"10.1.0.5","score":100},{"IP":"0.0.0.0","score":70},{"IP":"9.0.0.1","score":7}]
         }
         fetch(`http://${url+post_path}`, {
             method: "get",
@@ -28,21 +28,22 @@ class App extends React.Component{
             // let x = JSON.parse(`[${val.toString()}]`)
             // console.log(x)
             this.setState({
-                values: JSON.parse(val)
+                //values: JSON.parse(val)
+                //values: [{"IP":"127.0.0.1","score":230},{"IP":"10.1.0.5","score":100},{"IP":"0.0.0.0","score":70},{"IP":"9.0.0.1","score":7}]
             })
         })
         console.log("SENT REQUEST")
     }
     render() {
         var i = 0;
-        let tstyle = {border: "1px solid silver", margin: "0px", padding: "0px"}
+        let tstyle = {border: "3px solid black",borderRadius: '10px', margin: "0px", padding: "0px", textAlign:'center', margin:'100px auto auto auto', padding:'17.5px', fontSize:'25px',fontFamily: "Times New Roman"}
         let list = this.state.values.map(x=>{
             i++
             return <tr style={tstyle} key={i}><td style={tstyle}>{x.IP}</td><td style={tstyle}>{x.score}</td></tr>
         })
         console.log(list)
-        return <div>
-            <button><a href="/" style={{ color: "#1b1b1b", textDecoration: ""}}>PLAY</a></button>
+        return <div style={{backgroundImage: 'url(/Sprites/BG.png)' ,height: screen.height,  textAlign:"center"}}>
+            <button style={{backgroundColor: "#e56400", fontSize:'50px',fontFamily: "Times New Roman", borderRadius:'10px'}}><a href="/" style={{backgroundColor: "#e56400", textDecoration: "", fontSize:'50px',fontFamily: "Times New Roman", borderRadius:'10px'}}>PLAY</a></button>
             <table style={tstyle}>
             <thead><th>IP</th><th>score</th></thead>
             {list}
