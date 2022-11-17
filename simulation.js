@@ -106,13 +106,14 @@ class RodObject extends GameObject {
 }
 
 class BirdObject extends GameObject {
-    auto_thresh = .5
-    tap_speed = -.037
+    auto_thresh = .9
+    tap_speed = -.026
 
     img_promise = getImage("sprites/bird not angry big.png")
 
     constructor(pos, vel) {
         super(pos, vel)
+        // if (vel) this.tap_speed = vel[1]
         this.img_promise.then(this.set_canvas)
     }
 
@@ -156,26 +157,32 @@ function render_entities(entities, canvas_context) {
 function handleGameEvent(event, entities, birds) {
     switch (event.type) {
     case 'Rod':
-        console.log("Inserted new rod from event")
+        // console.log("Inserted new rod from event")
         entities.push(new RodObject(
             [1.5, event.props.height]));
         break;
     case 'Bird':
         console.log("Bird Tap!")
         for (let bird of birds)
-            bird.vel[1] = -.02
+            bird.vel[1] = bird.tap_speed
     }
 }
 
-function simulate(queue) {
-    const MAX_EVENT_DELAY = 12000
+function simulate(queue, start_time) {
+    const MAX_EVENT_DELAY = 1200
 
-    let start_time = event_generator(queue);
+    event_generator(queue, start_time);
 
     let entities = []
     let birds = []
 
-    birds.push(new BirdObject([.2, .5], [0, -.4]))
+    console.log('Bird Object:', (new BirdObject()).tap_speed)
+    birds.push(new BirdObject([.2, 1], [0, (new BirdObject()).tap_speed]))
+    // birds.push(new BirdObject([.5, .5], [0, -.032]))
+    // birds.push(new BirdObject([.4, .6], [0, -.033]))
+    // birds.push(new BirdObject([.3, .7], [0, -.034]))
+    // birds.push(new BirdObject([.2, .8], [0, -.035]))
+    // birds.push(new BirdObject([.1, .9], [0, -.036]))
     for (let bird of birds)
         entities.push(bird)
 
@@ -189,15 +196,16 @@ function simulate(queue) {
         for (let event_idx in queue) {
             let event = queue[event_idx];
             let delta = event.time - now;
-            if (-3 < delta && delta < 5) {
+            if (-11 < delta && delta < 13) {
                 handleGameEvent(event, entities, birds);
-                console.log("HANDLING EVENT", entities)
-            } else if (delta > MAX_EVENT_DELAY) {
+                // console.log("HANDLING EVENT", entities)
+            } else if (delta < -MAX_EVENT_DELAY) {
                 ended_events.push(event_idx);
             }
         }
 
         ended_events.reverse()
+        if (queue.length > 150) console.log('Q', queue.length)
         for (let event_idx of ended_events) {
             queue.splice(event_idx, 1)
         }
@@ -210,7 +218,7 @@ function simulate(queue) {
             if (!exists) ended.push(rod_idx)
         }
         // console.log("ELEN", entities.length)
-        if (ended.length) console.log("DELETED THINGS")
+        // if (ended.length) console.log("DELETED THINGS")
 
         // remove entities that won't be simulated anymore
         ended.reverse()
@@ -230,29 +238,29 @@ function simulate(queue) {
     return entities
 }
 
-function event_generator(queue) {  // imitates server and user sending events
-    const ROD_INTERVAL = 120_000/72
+function event_generator(queue, start_time) {  // imitates server and user sending events
+    const ROD_INTERVAL = 2000
     
-    let start_time = new Date();
     setInterval(() => {
         // console.log("NEW ROD EVENT")
         let now = new Date() - start_time;
         queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
-            height: Math.random()
+            height: Math.random()+.2
         }));
+        // console.log(queue.length)
         // console.log("QUEUE", queue)
     }, ROD_INTERVAL);
     
     const BIRD_INTERVAL = 1200
     
-    setInterval(() => {
-        // console.log("NEW ROD EVENT")
-        let now = new Date() - start_time;
-        queue.push(new GameEvent('Bird', now+BIRD_INTERVAL, {
-            vel: [.1, Math.random()*.8+.4]
-        }));
-        // console.log("QUEUE", queue)
-    }, BIRD_INTERVAL);
+    // setInterval(() => {
+    //     // console.log("NEW ROD EVENT")
+    //     let now = new Date() - start_time;
+    //     queue.push(new GameEvent('Bird', now+BIRD_INTERVAL, {
+    //         vel: [.1, Math.random()*.8+.4]
+    //     }));
+    //     // console.log("QUEUE", queue)
+    // }, BIRD_INTERVAL);
     
     return start_time;
 

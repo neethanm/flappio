@@ -1,11 +1,11 @@
-function init() {
+function init(start_time) {
     console.log("foo")
     if (!window.screen.width){
-        return;
+        return [];
     }
     console.log("INIT IS RUNNING")
     let event_queue = []
-    let entities = simulate(event_queue);  // simulate() is asynchronous
+    let entities = simulate(event_queue, start_time);  // simulate() is asynchronous
 
     // entities.push(new RodObject([.6, .56]));
     // entities.push(new BlankObject([.4, .4], 602, 144))
@@ -54,7 +54,8 @@ function init() {
         });
     }, 1000/FPS);
 
-    console.log("INIT ENDED")
+    console.log("INIT ENDED, returning", event_queue)
+    return event_queue
 }
 
 function slide_bg() {
