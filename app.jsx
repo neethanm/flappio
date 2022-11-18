@@ -24,9 +24,14 @@ var queue = init(start_time)
 const BIRD_INTERVAL = 20
 
 document.onkeydown = (e) => {
+    // if (e.repeat) return;
     let now = new Date() - start_time
     // console.log(e, queue)
-    if (e.code === 'Space') {
-        queue.push(new GameEvent('Bird', now+BIRD_INTERVAL))
+    switch (e.code) {
+    case 'Space':
+        queue.push(new GameEvent('Bird', now+BIRD_INTERVAL)); break;
+    case 'Enter':
+        queue.push(new GameEvent('Freeze', now+BIRD_INTERVAL)); break;
+
     }
 }

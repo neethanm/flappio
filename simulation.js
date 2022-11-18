@@ -1,5 +1,23 @@
 const FPS = 60  // combine into one file
 const GRAVITY = .0981/FPS
+// const GRAVITY = 0.00000
+
+const DEBUG = false
+// const D_MOVING_BIRD = false
+const D_MOVING_BIRD = true
+
+const BIRD_SPAWN_X = .13
+const BIRD_SPAWN_Y = .40
+
+const ROD_VEL = -.013;
+// const ROD_VEL = 0;
+// const ROD_SPAWN_X = .2
+const ROD_SPAWN_X = 1
+// const ROD_SPAWN_Y = () => .25
+// const ROD_SPAWN_Y = () => .63
+const ROD_SPAWN_Y = () => Math.random()*(.63-.25)+.25
+
+var game_score = 0;
 
 class GameEvent {
     constructor(type, time, props) {
@@ -9,9 +27,9 @@ class GameEvent {
     }
 }
 
-async function getImage(path, w, h, scale){
+function getImage(path){
     // conver image loading from async to synchronous using a Promise
-    return await new Promise(ret => {
+    return new Promise(ret => {
         let img = new Image();
         img.src = path;
         img.onload = () => ret(img);  // return when img is loaded
@@ -66,41 +84,95 @@ class GameObject {
     render(canvas_context) {
         let offscreenRod = this.img
         let pos = [this.pos[0]*screen.width,this.pos[1]*screen.height];
-        // TODO: Center the rod
+        if (DEBUG) {
+            canvas_context.fillStyle = "#fff"
+            canvas_context.fillRect(...pos, 5, 5);
+            canvas_context.fillStyle = "#000"
+            canvas_context.fillRect(...pos, 4, 4);
+        }
         canvas_context.drawImage(offscreenRod, pos[0], pos[1]);
     }
 
 }
 
 class RodObject extends GameObject {
-    rod_vel = -.013;
-    rod_gap = 550
+    rod_gap = 650  // TODO convert to fraction
     rod_scale = .4
-    // rod_vel = -.000;
 
     img_promise = getImage("sprites/rod.png")
     
     constructor(pos) {
         super(pos, [0, 0], 10, 10)
-        this.vel[0] = this.rod_vel
+        this.vel[0] = ROD_VEL
         this.img_promise.then(this.set_canvas)
     }
+
+    get_corridor() {
+        return [
+            this.pos[0]-.06, this.pos[1]-.23,  // x1, y1
+            this.pos[0]+.10, this.pos[1]+.03,     // x2, y2
+        ]
+    }
+
+    tick(queue, now, birds) {
+        const HIT_INTERVAL = 15
+        
+        this.pos[0] += this.vel[0]
+        this.pos[1] += this.vel[1]
+
+        // console.log("OBJ", screen.width*this.pos[0], screen.height*this.pos[1])
+        
+        if (this.pos[0] < -.6 || 1.6 < this.pos[0]) return false;
+        if (this.pos[1] < -.6 || 1.6 < this.pos[1]) return false;
+
+        let [x1, y1, x2, y2] = this.get_corridor();
+        for (let bird of birds) {
+            if (x1 < bird.pos[0] && bird.pos[0] < x2) {
+                // console.log(this.pos[1]-bird.pos[1])
+                if (y1 < bird.pos[1] && bird.pos[1] < y2) {
+                    queue.push(new GameEvent('Miss', now + HIT_INTERVAL, {
+                        bird: bird,
+                        rod_pos: this.pos[1],
+
+                    }))
+                } else {
+                    queue.push(new GameEvent('Hit', now + HIT_INTERVAL, {
+                        bird: bird
+                    }))
+                }
+            }
+        }
+        
+        return true;
+    }
+
 
     render(canvas_context) {
         // console.log(this.ctx)
         if (this.img === undefined) return;
         let offscreenRod = this.img
-        let pos = [this.pos[0]*screen.width/this.rod_scale,this.pos[1]*screen.height];
-        // TODO: Center the rod
-        canvas_context.scale(.5, .5)
+        let pos = [this.pos[0]*screen.width/this.rod_scale,this.pos[1]*screen.height/this.rod_scale];
+
+        let [x1, y1, x2, y2] = this.get_corridor();
+        let d_pos = [x1*screen.width,y1*screen.height];
+        let d_dim = [(x2-x1)*screen.width,(y2-y1)*screen.height];
+        
+        if (DEBUG) {
+            canvas_context.fillStyle = "#ff9088"
+            canvas_context.fillRect(d_pos[0], 0, d_dim[0], screen.height)
+            // canvas_context.fillStyle = "#ff9088"
+            canvas_context.clearRect(...d_pos, ...d_dim)
+        }
+        canvas_context.scale(this.rod_scale, this.rod_scale)
         canvas_context.drawImage(offscreenRod, pos[0], +pos[1]+this.rod_gap/2);
-        // console.log(pos[0], pos[0]+this.w/2, this.w)
+        // // console.log(pos[0], pos[0]+this.w/2, this.w)
         // canvas_context.fillStyle = "#ffffff"
         // canvas_context.fillRect(...pos, 12, 12)
         // canvas_context.fillStyle = "#1b1b1b"
         // canvas_context.fillRect(...pos, 10, 10)
         canvas_context.scale(1, -1)
         canvas_context.drawImage(offscreenRod, pos[0], -pos[1]+this.rod_gap/2);
+
         canvas_context.setTransform(1, 0, 0, 1, 0, 0)
     }
 }
@@ -108,6 +180,7 @@ class RodObject extends GameObject {
 class BirdObject extends GameObject {
     auto_thresh = .9
     tap_speed = -.026
+    // tap_speed = -.006
 
     img_promise = getImage("sprites/bird not angry big.png")
 
@@ -118,34 +191,33 @@ class BirdObject extends GameObject {
     }
 
     tick() {
-        this.pos[0] += this.vel[0]
-        this.pos[1] += this.vel[1]
+        if (D_MOVING_BIRD) {
+            this.pos[0] += this.vel[0]
+            this.pos[1] += this.vel[1]
+        }
 
         this.vel[1] += GRAVITY
-        // console.log(this.pos[1], this.vel[1])
+        // console.log("BIRD p & v", this.pos[1], this.vel[1])
 
         // console.log("OBJ", screen.width*this.pos[0], screen.height*this.pos[1])
         
         if (this.pos[1] > this.auto_thresh) this.vel[1] = this.tap_speed;
+        // if (this.pos[1] > this.auto_thresh) this.vel[1] = -Math.abs(this.vel[1]);
+        // if (this.pos[1] < 0) this.vel[1] = Math.abs(this.vel[1]);
         return true;
     }
 }
 
 class BlankObject extends GameObject {
-    img_promise = getImage('Sprites/blank.png')
+    // img_promise = getImage('Sprites/blank.png')
     
-    constructor(pos) {
-        super(pos, [0, 0])
-        this.img_promise.then(this.set_canvas)
+    constructor() {
+        super([0, 0], [0, 0])
+        // this.img_promise.then(this.set_canvas)
     }
     
     render(canvas_context) {
-        let ctx = this.canvas.getContext("2d")
-        let pos = [this.pos[0]*screen.width, this.pos[1]*screen.height]
-
-        let data = ctx.getImageData(0, 0, this.w, this.h)
-    
-        canvas_context.putImageData(data, pos[0], pos[1])
+        canvas_context.clearRect(0, 0, screen.width, screen.height)
         // console.log(this, ":- Image has been drawn")
     }
 }
@@ -159,12 +231,33 @@ function handleGameEvent(event, entities, birds) {
     case 'Rod':
         // console.log("Inserted new rod from event")
         entities.push(new RodObject(
-            [1.5, event.props.height]));
+            [ROD_SPAWN_X, event.props.height]));
         break;
     case 'Bird':
-        console.log("Bird Tap!")
-        for (let bird of birds)
+        // console.log("Bird Tap!")
+        for (let bird of birds) {
             bird.vel[1] = bird.tap_speed
+            // bird.vel[1] += .001
+            // bird.vel[1] = -bird.vel[1] 
+            // console.log(bird.tap_speed)
+        }
+        break;
+    case 'Freeze':
+        for (let bird of birds)
+            // if (bird.vel[1]) bird.vel[1] = 0;
+            // else bird.vel[1] = bird.tap_speed;
+            bird.vel[1] -= .001;
+        break;
+    case 'Hit':
+        console.log("COLLISION")
+        if (D_MOVING_BIRD) {
+            window.location.href = '/leaderboard.html'
+            entities.push(new BlankObject());
+        }
+        
+    case 'Miss':
+        console.log("POINT!")
+
     }
 }
 
@@ -177,7 +270,8 @@ function simulate(queue, start_time) {
     let birds = []
 
     console.log('Bird Object:', (new BirdObject()).tap_speed)
-    birds.push(new BirdObject([.2, 1], [0, (new BirdObject()).tap_speed]))
+    // birds.push(new BirdObject([.2, 1], [0, (new BirdObject()).tap_speed]))
+    birds.push(new BirdObject([BIRD_SPAWN_X, BIRD_SPAWN_Y], [0, (new BirdObject()).tap_speed]))
     // birds.push(new BirdObject([.5, .5], [0, -.032]))
     // birds.push(new BirdObject([.4, .6], [0, -.033]))
     // birds.push(new BirdObject([.3, .7], [0, -.034]))
@@ -213,7 +307,7 @@ function simulate(queue, start_time) {
         // tick all entities
         let ended = []
         for (let rod_idx in entities) {
-            let exists = entities[rod_idx].tick()
+            let exists = entities[rod_idx].tick(queue, now, birds)
             // console.log(entities[rod_idx]);
             if (!exists) ended.push(rod_idx)
         }
@@ -240,28 +334,16 @@ function simulate(queue, start_time) {
 
 function event_generator(queue, start_time) {  // imitates server and user sending events
     const ROD_INTERVAL = 1500
+    const ROD_DELAY = 50
     
     setInterval(() => {
         // console.log("NEW ROD EVENT")
         let now = new Date() - start_time;
-        queue.push(new GameEvent('Rod', now + ROD_INTERVAL, {
-            height: Math.random()*.7+.5
+        queue.push(new GameEvent('Rod', now + ROD_DELAY, {
+            // height: Math.random()*.7+.5
+            height: ROD_SPAWN_Y()
         }));
         // console.log(queue.length)
         // console.log("QUEUE", queue)
     }, ROD_INTERVAL);
-    
-    const BIRD_INTERVAL = 1200
-    
-    // setInterval(() => {
-    //     // console.log("NEW ROD EVENT")
-    //     let now = new Date() - start_time;
-    //     queue.push(new GameEvent('Bird', now+BIRD_INTERVAL, {
-    //         vel: [.1, Math.random()*.8+.4]
-    //     }));
-    //     // console.log("QUEUE", queue)
-    // }, BIRD_INTERVAL);
-    
-    return start_time;
-
 }
