@@ -244,8 +244,8 @@ function event_generator(queue, start_time) {  // imitates server and user sendi
     setInterval(() => {
         // console.log("NEW ROD EVENT")
         let now = new Date() - start_time;
-        queue.push(new GameEvent('Rod', now+ROD_INTERVAL, {
-            height: Math.random()+.2
+        queue.push(new GameEvent('Rod', now + ROD_INTERVAL, {
+            height: Math.random()*.7+.5
         }));
         // console.log(queue.length)
         // console.log("QUEUE", queue)
