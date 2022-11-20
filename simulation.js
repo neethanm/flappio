@@ -19,12 +19,151 @@ const ROD_SPAWN_Y = () => Math.random()*(.63-.25)+.25
 
 var game_score = 0;
 
+function simulate(queue, start_time) {
+    const MAX_EVENT_DELAY = 1200
+
+    event_generator(queue, start_time);
+
+    let entities = []
+    let birds = []
+
+    console.log('Bird Object:', (new BirdObject()).tap_speed)
+    // birds.push(new BirdObject([.2, 1], [0, (new BirdObject()).tap_speed]))
+    birds.push(new BirdObject([BIRD_SPAWN_X, BIRD_SPAWN_Y], [0, (new BirdObject()).tap_speed]))
+    // birds.push(new BirdObject([.5, .5], [0, -.032]))
+    // birds.push(new BirdObject([.4, .6], [0, -.033]))
+    // birds.push(new BirdObject([.3, .7], [0, -.034]))
+    // birds.push(new BirdObject([.2, .8], [0, -.035]))
+    // birds.push(new BirdObject([.1, .9], [0, -.036]))
+    for (let bird of birds)
+        entities.push(bird)
+
+    setInterval(function simulation_tick() {
+        let now = new Date().getTime() - start_time;
+        // console.log("SIMULATION TICK", now)
+        
+        // TODO: change entities from events
+        let ended_events = [];
+        // if (queue.length) console.log('NEW HANDLING')
+        for (let event_idx in queue) {
+            let event = queue[event_idx];
+            let delta = event.time - now;
+            if (-11 < delta && delta < 13) {
+                handleGameEvent(event, entities, birds);
+                // console.log("HANDLING EVENT", entities)
+            } else if (delta < -MAX_EVENT_DELAY) {
+                ended_events.push(event_idx);
+            }
+        }
+
+        ended_events.reverse()
+        if (queue.length > 150) console.log('Q', queue.length)
+        for (let event_idx of ended_events) {
+            queue.splice(event_idx, 1)
+        }
+
+        // tick all entities
+        let ended = []
+        for (let rod_idx in entities) {
+            let exists = entities[rod_idx].tick(queue, now, birds)
+            // console.log(entities[rod_idx]);
+            if (!exists) ended.push(rod_idx)
+        }
+        // console.log("ELEN", entities.length)
+        // if (ended.length) console.log("DELETED THINGS")
+
+        // remove entities that won't be simulated anymore
+        ended.reverse()
+        for (let rod_idx of ended) {
+            entities.splice(rod_idx, 1)
+        }
+
+        // console.log(entities)
+        // console.log(queue);
+
+    }, 1000/FPS);
+
+    // setInterval(() => {
+    //     console.log("ENTITIES", entities)
+    // }, 1000);
+    
+    return entities
+}
+
+function event_generator(queue, start_time) {  // imitates server and user sending events
+    const ROD_INTERVAL = 1500
+    const ROD_DELAY = 50
+    
+    setInterval(() => {
+        // console.log("NEW ROD EVENT")
+        let now = new Date() - start_time;
+        queue.push(new GameEvent('Rod', now + ROD_DELAY, {
+            // height: Math.random()*.7+.5
+            height: ROD_SPAWN_Y()
+        }));
+        // console.log(queue.length)
+        // console.log("QUEUE", queue)
+    }, ROD_INTERVAL);
+
+    document.onkeydown = (e) => {
+        // if (e.repeat) return;
+        let now = new Date() - start_time
+        // console.log(e, queue)
+        switch (e.code) {
+            case 'Space':
+                queue.push(new GameEvent('Bird', now + BIRD_INTERVAL)); break;
+            case 'Enter':
+                queue.push(new GameEvent('Freeze', now + BIRD_INTERVAL)); break;
+
+        }
+    }
+}
+
 class GameEvent {
     constructor(type, time, props) {
         this.type = type
         this.time = time
         this.props = props
     }
+}
+
+function handleGameEvent(event, entities, birds) {
+    switch (event.type) {
+    case 'Rod':
+        // console.log("Inserted new rod from event")
+        entities.push(new RodObject(
+            [ROD_SPAWN_X, event.props.height]));
+        break;
+    case 'Bird':
+        // console.log("Bird Tap!")
+        for (let bird of birds) {
+            bird.vel[1] = bird.tap_speed
+            // bird.vel[1] += .001
+            // bird.vel[1] = -bird.vel[1] 
+            // console.log(bird.tap_speed)
+        }
+        break;
+    case 'Freeze':
+        for (let bird of birds)
+            // if (bird.vel[1]) bird.vel[1] = 0;
+            // else bird.vel[1] = bird.tap_speed;
+            bird.vel[1] -= .001;
+        break;
+    case 'Hit':
+        console.log("COLLISION")
+        if (D_MOVING_BIRD) {
+            window.location.href = '/leaderboard.html'
+            entities.push(new BlankObject());
+        }
+        
+    case 'Miss':
+        console.log("POINT!")
+
+    }
+}
+
+function render_entities(entities, canvas_context) {
+    for (entity of entities) entity.render(canvas_context)
 }
 
 function getImage(path){
@@ -222,141 +361,4 @@ class BlankObject extends GameObject {
     }
 }
 
-function render_entities(entities, canvas_context) {
-    for (entity of entities) entity.render(canvas_context)
-}
 
-function handleGameEvent(event, entities, birds) {
-    switch (event.type) {
-    case 'Rod':
-        // console.log("Inserted new rod from event")
-        entities.push(new RodObject(
-            [ROD_SPAWN_X, event.props.height]));
-        break;
-    case 'Bird':
-        // console.log("Bird Tap!")
-        for (let bird of birds) {
-            bird.vel[1] = bird.tap_speed
-            // bird.vel[1] += .001
-            // bird.vel[1] = -bird.vel[1] 
-            // console.log(bird.tap_speed)
-        }
-        break;
-    case 'Freeze':
-        for (let bird of birds)
-            // if (bird.vel[1]) bird.vel[1] = 0;
-            // else bird.vel[1] = bird.tap_speed;
-            bird.vel[1] -= .001;
-        break;
-    case 'Hit':
-        console.log("COLLISION")
-        if (D_MOVING_BIRD) {
-            window.location.href = '/leaderboard.html'
-            entities.push(new BlankObject());
-        }
-        
-    case 'Miss':
-        console.log("POINT!")
-
-    }
-}
-
-function simulate(queue, start_time) {
-    const MAX_EVENT_DELAY = 1200
-
-    event_generator(queue, start_time);
-
-    let entities = []
-    let birds = []
-
-    console.log('Bird Object:', (new BirdObject()).tap_speed)
-    // birds.push(new BirdObject([.2, 1], [0, (new BirdObject()).tap_speed]))
-    birds.push(new BirdObject([BIRD_SPAWN_X, BIRD_SPAWN_Y], [0, (new BirdObject()).tap_speed]))
-    // birds.push(new BirdObject([.5, .5], [0, -.032]))
-    // birds.push(new BirdObject([.4, .6], [0, -.033]))
-    // birds.push(new BirdObject([.3, .7], [0, -.034]))
-    // birds.push(new BirdObject([.2, .8], [0, -.035]))
-    // birds.push(new BirdObject([.1, .9], [0, -.036]))
-    for (let bird of birds)
-        entities.push(bird)
-
-    setInterval(function simulation_tick() {
-        let now = new Date().getTime() - start_time;
-        // console.log("SIMULATION TICK", now)
-        
-        // TODO: change entities from events
-        let ended_events = [];
-        // if (queue.length) console.log('NEW HANDLING')
-        for (let event_idx in queue) {
-            let event = queue[event_idx];
-            let delta = event.time - now;
-            if (-11 < delta && delta < 13) {
-                handleGameEvent(event, entities, birds);
-                // console.log("HANDLING EVENT", entities)
-            } else if (delta < -MAX_EVENT_DELAY) {
-                ended_events.push(event_idx);
-            }
-        }
-
-        ended_events.reverse()
-        if (queue.length > 150) console.log('Q', queue.length)
-        for (let event_idx of ended_events) {
-            queue.splice(event_idx, 1)
-        }
-
-        // tick all entities
-        let ended = []
-        for (let rod_idx in entities) {
-            let exists = entities[rod_idx].tick(queue, now, birds)
-            // console.log(entities[rod_idx]);
-            if (!exists) ended.push(rod_idx)
-        }
-        // console.log("ELEN", entities.length)
-        // if (ended.length) console.log("DELETED THINGS")
-
-        // remove entities that won't be simulated anymore
-        ended.reverse()
-        for (let rod_idx of ended) {
-            entities.splice(rod_idx, 1)
-        }
-
-        // console.log(entities)
-        // console.log(queue);
-
-    }, 1000/FPS);
-
-    // setInterval(() => {
-    //     console.log("ENTITIES", entities)
-    // }, 1000);
-    
-    return entities
-}
-
-function event_generator(queue, start_time) {  // imitates server and user sending events
-    const ROD_INTERVAL = 1500
-    const ROD_DELAY = 50
-    
-    setInterval(() => {
-        // console.log("NEW ROD EVENT")
-        let now = new Date() - start_time;
-        queue.push(new GameEvent('Rod', now + ROD_DELAY, {
-            // height: Math.random()*.7+.5
-            height: ROD_SPAWN_Y()
-        }));
-        // console.log(queue.length)
-        // console.log("QUEUE", queue)
-    }, ROD_INTERVAL);
-
-    document.onkeydown = (e) => {
-        // if (e.repeat) return;
-        let now = new Date() - start_time
-        // console.log(e, queue)
-        switch (e.code) {
-            case 'Space':
-                queue.push(new GameEvent('Bird', now + BIRD_INTERVAL)); break;
-            case 'Enter':
-                queue.push(new GameEvent('Freeze', now + BIRD_INTERVAL)); break;
-
-        }
-    }
-}
