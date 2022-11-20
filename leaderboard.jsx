@@ -38,6 +38,7 @@ class App extends React.Component{
     render() {
         var i = 0;
         let tstyle = {border: "3px solid black",borderRadius: '10px', margin: "0px", padding: "0px", textAlign:'center', margin:'100px auto auto auto', padding:'17.5px', fontSize:'25px',fontFamily: "Times New Roman"}
+        let tstyle2= {border: "0px solid black",borderRadius: '10px', margin: "0px", padding: "0px", textAlign:'center', margin:'100px auto auto auto', padding:'17.5px', fontSize:'25px',fontFamily: "Times New Roman"}
         let list = this.state.values.map(x=>{
             i++
             return <tr style={tstyle} key={i}><td style={tstyle}>{x.IP}</td><td style={tstyle}>{x.score}</td></tr>
@@ -45,7 +46,8 @@ class App extends React.Component{
         console.log(list)
         return <div style={{backgroundImage: 'url(/Sprites/BG.png)' ,height: screen.height,  textAlign:"center"}}>
             <button style={{backgroundColor: "#e56400", fontSize:'50px',fontFamily: "Times New Roman", borderRadius:'10px'}}><a href="/" style={{backgroundColor: "#e56400", textDecoration: "", fontSize:'50px',fontFamily: "Times New Roman", borderRadius:'10px'}}>PLAY</a></button>
-            <table style={tstyle}>
+        
+            <table style={tstyle2}>
             <thead><th>IP</th><th>score</th></thead>
             {list}
             </table>
