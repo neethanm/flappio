@@ -1,4 +1,4 @@
-function init(start_time) {
+function init() {
     if (!window.screen.width){
         return [];
     }
