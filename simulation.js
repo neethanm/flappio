@@ -346,4 +346,17 @@ function event_generator(queue, start_time) {  // imitates server and user sendi
         // console.log(queue.length)
         // console.log("QUEUE", queue)
     }, ROD_INTERVAL);
+
+    document.onkeydown = (e) => {
+        // if (e.repeat) return;
+        let now = new Date() - start_time
+        // console.log(e, queue)
+        switch (e.code) {
+            case 'Space':
+                queue.push(new GameEvent('Bird', now + BIRD_INTERVAL)); break;
+            case 'Enter':
+                queue.push(new GameEvent('Freeze', now + BIRD_INTERVAL)); break;
+
+        }
+    }
 }

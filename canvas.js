@@ -1,9 +1,8 @@
 function init(start_time) {
-    console.log("foo")
     if (!window.screen.width){
         return [];
     }
-    console.log("INIT IS RUNNING")
+    const start_time = new Date()
     let event_queue = []
     let entities = simulate(event_queue, start_time);  // simulate() is asynchronous
 
@@ -16,7 +15,6 @@ function init(start_time) {
     // entities.push(new BirdObject([.4, .3], [0, 1.5], 512, 512))
     // entities.push(new BirdObject([.5, .3], [0, 1.6], 512, 512))
     // entities.push(new BirdObject([.6, .3], [0, 1.7], 512, 512))
-   console.log("foo") 
     slide_bg()
 
     let canvas = document.querySelector('#game-canvas')
