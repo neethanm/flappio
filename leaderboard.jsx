@@ -1,12 +1,13 @@
 // var url = '10.3.32.120:3001/'
-var url = '10.14.143.103:3001/'
-// var url = 'localhost:3001/'
+// var url = '10.14.143.103:3001/'
+var url = 'localhost:3001/'
 var post_path = 'leaderboard'
 class App extends React.Component{
     constructor(props) {
         super(props)
         this.state = {
-            values: [{"IP":"127.0.0.1","score":230},{"IP":"10.1.0.5","score":100},{"IP":"0.0.0.0","score":70},{"IP":"9.0.0.1","score":7}]
+            // values: [{"IP":"127.0.0.1","score":230},{"IP":"10.1.0.5","score":100},{"IP":"0.0.0.0","score":70},{"IP":"9.0.0.1","score":7}]
+            values: []
         }
         fetch(`http://${url+post_path}`, {
             method: "get",
@@ -28,7 +29,7 @@ class App extends React.Component{
             // let x = JSON.parse(`[${val.toString()}]`)
             // console.log(x)
             this.setState({
-                //values: JSON.parse(val)
+                values: JSON.parse(val)
                 //values: [{"IP":"127.0.0.1","score":230},{"IP":"10.1.0.5","score":100},{"IP":"0.0.0.0","score":70},{"IP":"9.0.0.1","score":7}]
             })
         })
