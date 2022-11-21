@@ -18,6 +18,10 @@ const ROD_SPAWN_X = 1
 const ROD_SPAWN_Y = () => Math.random()*(.63-.25)+.25
 
 var game_score = 0;
+var last_rod_id = null;
+
+var url = 'localhost:3001/'
+var post_path = 'leaderboard'
 
 function simulate(queue, start_time) {
     const MAX_EVENT_DELAY = 1200
@@ -119,6 +123,10 @@ function event_generator(queue, start_time) {  // imitates server and user sendi
     }
 }
 
+function send_score(score) {
+    console.log('ADD SCORE', score)
+}
+
 class GameEvent {
     constructor(type, time, props) {
         this.type = type
@@ -155,15 +163,22 @@ function handleGameEvent(event, entities, birds) {
             window.location.href = '/leaderboard.html'
             entities.push(new BlankObject());
         }
+        break;
         
     case 'Miss':
-        console.log("POINT!")
-
+        if (last_rod_id === event.props.rod_id) return;
+        game_score++;
+        console.log("POINT!", game_score)
+        console.log("UNEQUAL ROD ID", last_rod_id, event.props.rod_id)
+        last_rod_id = event.props.rod_id;
     }
 }
 
 function render_entities(entities, canvas_context) {
-    for (entity of entities) entity.render(canvas_context)
+    for (entity of entities) {
+        entity.render(canvas_context)
+        if (entity instanceof BlankObject) break;
+    }
 }
 
 function getImage(path){
@@ -272,7 +287,7 @@ class RodObject extends GameObject {
                     queue.push(new GameEvent('Miss', now + HIT_INTERVAL, {
                         bird: bird,
                         rod_pos: this.pos[1],
-
+                        rod_id: this.id.toString(),
                     }))
                 } else {
                     queue.push(new GameEvent('Hit', now + HIT_INTERVAL, {
