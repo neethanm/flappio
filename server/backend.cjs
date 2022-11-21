@@ -1,13 +1,14 @@
 const express = require('express')
 const cors = require('cors')
-const bodyParser = require('body-parser')
+// const bodyParser = require('body-parser')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
 
 const db_url = 'mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false'
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
+// app.use(bodyParser.json())
+app.use(express.text())
+// app.use(bodyParser.urlencoded({extended: true}))
 app.use(cors())
 
 MongoClient.connect(db_url, (err, db) => {
@@ -25,15 +26,26 @@ MongoClient.connect(db_url, (err, db) => {
         )).toArray()
     } 
     
-    scores_getOne = async function (IP) {
-        console.log("Retrieving Leaderboard")
-        return await leaderboard.find(
-            {IP: IP},
+    scores_getOne = function (IP) {
+        console.log("Retrieving Item")
+        let lead = leaderboard.find(
+            { IP: IP },
             {} // dd
         )
+        console.log(lead)
+        return lead
     }
-    
+
     scores_update = async function (IP, score) {
+        let record = await (scores_getOne(IP).toArray());
+        console.log("HERE BE THE RECORD", record)
+        if (record.length) {
+            console.log("HERE BE THE OLD SCORE", record[0].score)
+            if (score < record[0].score) {
+                console.log("THYNE SCORES ARE THUSLY BELOW")
+                return;
+            }
+        }
         console.log("Changing score")
         await leaderboard.updateOne(
             {IP: IP},
@@ -53,18 +65,21 @@ app.get('/leaderboard', (req, res) => {
     console.log(req.headers['origin'], req.headers)
     let ip = req.headers['origin']
 
-    scores_get(ip, (new Date()).toString()).then((val) => {
+    scores_get().then((val) => {
         console.log(val)
         res.status(200).send(JSON.stringify(val))
     })
 })
 
 app.post('/leaderboard', (req, res) => {
-    console.log("Got request to leaderboard")
-    console.log(req.headers['origin'], req.headers)
+    // console.log("Got request to leaderboard")
+    // console.log(req.headers['origin'], req.headers)
     let ip = req.headers['origin']
+    console.log("REQ BODY:", req.body, req.headers)
 
-    scores_update(ip, (new Date()).toString()).then(() =>
+    console.log(req)
+
+    scores_update(ip, Number(req.body)).then(() =>
         res.status(200).send(`Did request for ${ip}`)
     )
 })

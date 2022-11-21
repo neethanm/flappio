@@ -125,6 +125,12 @@ function event_generator(queue, start_time) {  // imitates server and user sendi
 
 function send_score(score) {
     console.log('ADD SCORE', score)
+    console.log(game_score)
+    return fetch(`http://${url+post_path}`, {
+        method: "POST",
+        headers: {'Content-Type': 'text/plain'},
+        body: game_score.toString(),
+    })
 }
 
 class GameEvent {
@@ -160,8 +166,12 @@ function handleGameEvent(event, entities, birds) {
     case 'Hit':
         console.log("COLLISION")
         if (D_MOVING_BIRD) {
-            window.location.href = '/leaderboard.html'
             entities.push(new BlankObject());
+            send_score(game_score).then(()=>{
+                window.location.href = '/leaderboard.html'
+            }).catch(()=>{
+                window.location.href = '/leaderboard.html'
+            })
         }
         break;
         
