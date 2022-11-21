@@ -1,7 +1,7 @@
 // var url = '10.3.32.120:3001/'
 // var url = '10.14.143.103:3001/'
 var url = 'localhost:3001/'
-var post_path = 'leaderboard'
+var get_path = 'leaderboard'
 class App extends React.Component{
     constructor(props) {
         super(props)
@@ -9,7 +9,7 @@ class App extends React.Component{
             // values: [{"IP":"127.0.0.1","score":230},{"IP":"10.1.0.5","score":100},{"IP":"0.0.0.0","score":70},{"IP":"9.0.0.1","score":7}]
             values: []
         }
-        fetch(`http://${url+post_path}`, {
+        fetch(`http://${url+get_path}`, {
             method: "get",
             // body: 12
         }).then(
@@ -43,13 +43,14 @@ class App extends React.Component{
             i++
             return <tr style={tstyle} key={i}><td style={tstyle}>{x.IP}</td><td style={tstyle}>{x.score}</td></tr>
         })
-        console.log(list)
-        return <div style={{backgroundImage: 'url(/Sprites/BG.png)' ,height: screen.height,  textAlign:"center"}}>
+        return <div style={{backgroundImage: 'url(/Sprites/BG.png)', backgroundSize: "contain", height: screen.height, margin: 0, textAlign:"center"}}>
             <button style={{backgroundColor: "#e56400", fontSize:'50px',fontFamily: "Times New Roman", borderRadius:'10px'}}><a href="/" style={{backgroundColor: "#e56400", textDecoration: "", fontSize:'50px',fontFamily: "Times New Roman", borderRadius:'10px'}}>PLAY</a></button>
         
             <table style={tstyle2}>
-            <thead><th>IP</th><th>score</th></thead>
-            {list}
+            <tbody>
+                <th>IP</th><th>score</th>
+                {list}
+            </tbody>
             </table>
         </div>
     }
