@@ -112,12 +112,12 @@ function event_generator(queue, start_time) {  // imitates server and user sendi
     document.onkeydown = (e) => {
         // if (e.repeat) return;
         let now = new Date() - start_time
-        // console.log(e, queue)
+        console.log(e, queue)
         switch (e.code) {
             case 'Space':
                 queue.push(new GameEvent('Bird', now + BIRD_INTERVAL)); break;
-            case 'Enter':
-                queue.push(new GameEvent('Freeze', now + BIRD_INTERVAL)); break;
+            // case 'Enter':
+            //     queue.push(new GameEvent('Freeze', now + BIRD_INTERVAL)); break;
 
         }
     }
@@ -185,7 +185,12 @@ function handleGameEvent(event, entities, birds) {
 }
 
 function render_entities(entities, canvas_context) {
+    let rendered_bird = false;
     for (entity of entities) {
+        if (entity instanceof BirdObject) {
+            if (rendered_bird) break;
+            rendered_bird = true;
+        }
         entity.render(canvas_context)
         if (entity instanceof BlankObject) break;
     }
